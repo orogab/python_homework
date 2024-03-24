@@ -3,13 +3,19 @@ from bs4 import BeautifulSoup
 
 def scrape_index():
     url = "https://index.hu/"
-    response = requests.get(url)
+    headers = {
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3'
+    }
+    response = requests.get(url, headers=headers)
 
     if response.status_code == 200:
         soup = BeautifulSoup(response.content, 'html.parser')
-        titles = soup.find_all('h1', class_='cikkcim')
+        
+        # Assuming the structure might have changed, trying a more generic approach:
+        # This attempts to fetch any main titles, adjust as necessary.
+        titles = soup.find_all(['h1', 'h2', 'h3'])
 
-        extracted_titles = [title.text.strip() for title in titles]
+        extracted_titles = [title.text.strip() for title in titles if 'cikkcim' in title.get('class', [])]
 
         return extracted_titles
     else:
